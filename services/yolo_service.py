@@ -3,7 +3,7 @@ from PIL import Image
 from ultralytics import YOLO
 
 class YOLOService:
-    def __init__(self, model_path: str = "best.pt"):
+    def __init__(self, model_path: str = "best.onnx"):
         # Load the trained YOLO model once when the service initializes
         self.model = YOLO(model_path)
 
