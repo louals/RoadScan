@@ -1,118 +1,43 @@
-# RoadScan Vision - Backend API Service
+# RoadScan
 
-A Backend designed to power the RoadScan Vision system. Built with **FastAPI** for asynchronous RESTful routing and **SQLAlchemy** for ORM and database management, fully integrated with a hosted **Supabase PostgreSQL** cluster.
+RoadScan is a community pothole reporting app for Algeria. The Next.js frontend captures a fresh photo from the live camera, attaches browser geolocation separately, and shows detected reports on an Algeria-only Leaflet map. FastAPI stores reports in Supabase PostgreSQL and uses the signed-in user as the report owner.
 
----
+## Local setup
 
-## Overview
+The backend reads its ignored root `.env` file. Copy `.env.example` to `.env` and fill in database and Cloudinary settings. `JWT_SECRET_KEY` must be a random value of at least 32 characters. The frontend reads `frontend/.env.local`; use `NEXT_PUBLIC_API_URL=http://127.0.0.1:8001` for this setup.
 
-* **Framework:** FastAPI (Python 3.8+)
-* **Database Engine:** PostgreSQL 17 (via Supabase Managed Database)
-* **ORM / Database Access:** SQLAlchemy Object-Relational Mapper
-* **Connection Pooling:** Supabase Transaction Connection Pooler (Port 6543 / Session pooling over TLS)
-* **ASGI Server:** Uvicorn
+Install and run the backend:
 
----
-
-
-## Visual Documentation 
-
-Visual references detailing the structural setup, model training using Google Colab, and execution verification logs are archived in the docu_images/ directory.
-
----
-
-## System Architecture & Network Design
-
-To mitigate DNS resolution degradation and local network socket exhaustion, the application routes database queries through Supabase's dedicated connection pooler rather than direct TCP connections to the PostgreSQL primary node.
-
-```
-+------------------+         HTTP/REST         +------------------------+
-|   Client / UI    | <-----------------------> |  FastAPI ASGI Service  |
-+------------------+                           +------------------------+
-                                                           |
-                                                  SQLAlchemy Connection
-                                                           |
-                                                           v
-                                               +------------------------+
-                                               |  Supabase Pooler       |
-                                               |  (aws-0-eu-west-1)     |
-                                               |  Port: 6543            |
-                                               +------------------------+
-                                                           |
-                                                           v
-                                               +------------------------+
-                                               | PostgreSQL Primary Node|
-                                               +------------------------+
+```sh
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+uvicorn main:app --reload --host 127.0.0.1 --port 8001
 ```
 
----
+Open Swagger at [http://127.0.0.1:8001/docs](http://127.0.0.1:8001/docs).
 
-## Prerequisites
+Run the frontend in another terminal:
 
-* Python 3.8 or higher
-* PostgreSQL client libraries (`libpq-dev` or binary equivalent)
-* Access credentials for the target Supabase project (`ytqwrnfyqozzlmnatclr`)
-
----
-
-## Environment Configuration
-
-Create a `.env` file in the root execution directory containing the required runtime parameters.
-
-```env
-DATABASE_URL=postgresql://postgres.ytqwrnfyqozzlmnatclr:<PASSWORD>@aws-0-eu-west-1.pooler.supabase.com:6543/postgres?sslmode=require
+```sh
+cd frontend
+npm install
+npm run dev
 ```
 
-> **Note:** Ensure that `<PASSWORD>` is replaced with the valid database user credential and that `sslmode=require` is enforced for secure encrypted transit over SSL/TLS.
+Open the app at [http://localhost:3000](http://localhost:3000). Browser access to device location requires permission and a secure context; localhost qualifies during development.
 
----
+## First administrator
 
-## Dependency Management & Installation
+The additive SQL migrations are in `migrations/`. For a new database setup, run them in order. To promote an existing table-created user and set that account's password, run this from the repository root and follow the prompts:
 
-Initialize your virtual environment and install all pinned production and development dependencies:
-
-```powershell
-# Create virtual environment
-python -m venv venv
-
-# Activate environment (Windows PowerShell)
-.\venv\Scripts\Activate.ps1
-
-# Install core runtime dependencies
-pip install fastapi uvicorn sqlalchemy psycopg2-binary python-dotenv
+```sh
+source .venv/bin/activate
+python scripts/bootstrap_admin.py
 ```
 
----
+The script stores only an Argon2 password hash and sets the selected user's role to `admin`. Admin sign-in redirects to `/admin`; both the admin page and its reports endpoint check the role. Public map reports remain available to everyone.
 
-## Local Development & Execution
+## Deployment
 
-Start the ASGI server instance with hot-reloading enabled for local iteration:
-
-```powershell
-uvicorn main:app --reload --host 127.0.0.1 --port 8000
-```
-
-Upon startup, the application executes a database readiness check (`SELECT version();`) via the SQLAlchemy engine lifecycle hook to verify valid connection pool setup.
-
----
-
-## API Reference
-
-| HTTP Method | Route | Description |
-| :--- | :--- | :--- |
-| `GET` | `/` | Health check endpoint returning service execution state. |
-| `GET` | `/tables` | Schema inspection query returning active tables in the `public` schema. |
-| `GET` | `/docs` | OpenAPI 3.0 specification UI (Swagger). |
-| `GET` | `/redoc` | Alternative ReDoc interface for OpenAPI documentation. |
-
----
-
-## Versioning & Git Initialization
-
-Recommended initial commit workflow:
-
-```powershell
-git init
-git add .
-git commit -m "feat(core): initial backend layout with Supabase connection pooling and dynamic schema endpoint"
-```
+Set backend environment variables in the hosting provider, including `DATABASE_URL`, Cloudinary credentials, `JWT_SECRET_KEY`, and `FRONTEND_ORIGINS` (comma-separated exact origins). Set `NEXT_PUBLIC_API_URL` to the public backend URL in the frontend hosting environment, then rebuild the frontend. Keep secrets out of `NEXT_PUBLIC_*` variables and out of git.

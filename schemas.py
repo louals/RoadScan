@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 from typing import Optional, List
 from datetime import datetime
 
@@ -14,10 +14,24 @@ class UserResponse(UserBase):
     id: int
     points: int
     level: str
+    role: str = "citizen"
     created_at: Optional[datetime] = None
 
     class Config:
         from_attributes = True
+
+
+class UserRegister(BaseModel):
+    email: EmailStr
+    username: str = Field(min_length=2, max_length=60)
+    password: str = Field(min_length=8, max_length=128)
+
+
+class TokenResponse(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+    expires_in: int
+    user: UserResponse
 
 
 # --- Report / Detection Schemas ---

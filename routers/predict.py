@@ -6,6 +6,8 @@ from fastapi import APIRouter, Depends, File, UploadFile, Form, HTTPException
 from sqlalchemy.orm import Session
 from database import get_db
 from models import Report
+from routers.auth import get_current_user
+from models import User
 from services.yolo_service import yolo_service
 from services.storage_service import storage_service  
 
@@ -15,9 +17,9 @@ router = APIRouter(prefix="/api/v1", tags=["Prediction"])
 async def predict_road_defect(
     latitude: float = Form(...),
     longitude: float = Form(...),
-    user_id: int = Form(1),
     file: UploadFile = File(...),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
     try:
         # 1. Read uploaded image bytes
@@ -70,7 +72,7 @@ async def predict_road_defect(
             detection_count=detection_count,
             detections_json=json.dumps(inference_result["detections_json"]),
             description=description,
-            user_id=user_id,
+            user_id=current_user.id,
             created_at=current_time,
             updated_at=current_time
         )

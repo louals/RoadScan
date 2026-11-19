@@ -8,6 +8,8 @@ class User(Base):
     id = Column(Integer, primary_key=True, index=True)
     email = Column(String, unique=True, index=True)
     username = Column(String)
+    password_hash = Column(String(255), nullable=True)
+    role = Column(String(30), nullable=False, default="citizen", server_default="citizen")
     points = Column(Integer, default=0)
     level = Column(String)
     created_at = Column(DateTime(timezone=True))
