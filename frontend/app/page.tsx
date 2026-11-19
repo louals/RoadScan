@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ArrowRight, Camera, Check, CircleAlert, LocateFixed, MapPin, ShieldCheck, LogOut } from "lucide-react";
+import { RoadScanMark } from "@/components/roadscan-mark";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { clearSession, getReports, getSavedUser, isAlgeriaCoordinate, Report, RoadScanUser, submitPotholeReport } from "@/lib/roadscan-api";
@@ -147,7 +148,7 @@ export default function Home() {
   return (
     <main className="reporting-app">
       <header className="tool-header">
-        <Link className="tool-brand" href="/" aria-label="RoadScan home"><span className="tool-brand-mark"><MapPin size={19} fill="currentColor"/></span><span>Road<span>Scan</span></span></Link>
+        <Link className="tool-brand" href="/" aria-label="RoadScan home"><span className="tool-brand-mark"><RoadScanMark/></span><span>Road<span>Scan</span></span></Link>
         <div className="tool-header-meta"><span className="map-live-dot"/>{loadError ? "Connecting…" : "Community map"}</div>
         <div className="tool-header-actions">{currentUser ? <><span className="signed-in-name">{currentUser.username}</span><button className="tool-admin-link" type="button" onClick={() => { clearSession(); setCurrentUser(null); }}><LogOut size={14}/> Sign out</button>{currentUser.role === "admin" && <Link className="tool-admin-link" href="/admin">Admin <ArrowRight size={14}/></Link>}</> : <Link className="tool-admin-link" href="/account">Sign in <ArrowRight size={14}/></Link>}</div>
       </header>

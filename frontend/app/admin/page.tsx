@@ -3,8 +3,9 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Activity, ArrowLeft, ArrowUpRight, CircleAlert, Clock3, ExternalLink, MapPin, RefreshCw, Search, Shield, TriangleAlert } from "lucide-react";
+import { ArrowLeft, ArrowUpRight, CircleAlert, Clock3, ExternalLink, MapPin, RefreshCw, Search, Shield, TriangleAlert } from "lucide-react";
 import { Report, RoadScanUser, formatReportDate, getAdminReports, getCurrentUser } from "@/lib/roadscan-api";
+import { RoadScanMark } from "@/components/roadscan-mark";
 
 export default function AdminPage() {
   const [reports, setReports] = useState<Report[]>([]);
@@ -43,7 +44,7 @@ export default function AdminPage() {
 
   return (
     <main className="admin-app">
-      <header className="admin-header"><Link className="admin-brand" href="/"><span className="admin-brand-icon"><Activity size={19}/></span><span>RoadScan <small>ADMIN</small></span></Link><Link className="back-public" href="/"><ArrowLeft size={15}/> Public map</Link><div className="admin-user"><span className="admin-avatar">{admin.username.slice(0, 1).toUpperCase()}</span><span>{admin.username}</span></div></header>
+      <header className="admin-header"><Link className="admin-brand" href="/"><span className="admin-brand-icon"><RoadScanMark/></span><span>RoadScan <small>ADMIN</small></span></Link><Link className="back-public" href="/"><ArrowLeft size={15}/> Public map</Link><div className="admin-user"><span className="admin-avatar">{admin.username.slice(0, 1).toUpperCase()}</span><span>{admin.username}</span></div></header>
       <div className="admin-content">
         <div className="admin-breadcrumb">ROADSCAN <span>/</span> ADMIN <span>/</span> <b>REPORTS</b></div>
         <div className="admin-title-row"><div><h1>Report review</h1><p>Review road issues submitted by the community.</p></div><button className="refresh-admin" onClick={() => void refresh()} disabled={loading}><RefreshCw size={15} className={loading ? "refresh-spin" : ""}/> Refresh</button></div>
