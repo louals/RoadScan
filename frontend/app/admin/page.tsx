@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { ArrowLeft, ArrowUpRight, CircleAlert, Clock3, ExternalLink, MapPin, RefreshCw, Search, Shield, TriangleAlert } from "lucide-react";
+import { ArrowLeft, ArrowUpRight, CircleAlert, Clock3, ExternalLink, MapPin, RefreshCw, Search, Shield, TriangleAlert , Activity } from "lucide-react";
 import { Report, RoadScanUser, formatReportDate, getAdminReports, getCurrentUser } from "@/lib/roadscan-api";
 import { RoadScanMark } from "@/components/roadscan-mark";
 
