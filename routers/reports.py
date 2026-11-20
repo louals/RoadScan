@@ -12,11 +12,13 @@ router = APIRouter(prefix="/api/v1", tags=["Reports"])
 
 @router.get("/reports", response_model=List[ReportResponse])
 def get_all_reports(skip: int = 0, limit: int = 50, db: Session = Depends(get_db)):
+    safe_skip = max(0, skip)
+    safe_limit = min(max(1, limit), 100)
     reports = (
         db.query(Report)
         .order_by(desc(Report.created_at), desc(Report.id))
-        .offset(skip)
-        .limit(limit)
+        .offset(safe_skip)
+        .limit(safe_limit)
         .all()
     )
     return reports
@@ -33,4 +35,6 @@ def get_report_by_id(report_id: int, db: Session = Depends(get_db)):
 def get_admin_reports(skip: int = 0, limit: int = 100, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     if current_user.role != "admin":
         raise HTTPException(status_code=403, detail="Administrator access required.")
-    return db.query(Report).order_by(desc(Report.created_at), desc(Report.id)).offset(skip).limit(min(limit, 250)).all()
+    safe_skip = max(0, skip)
+    safe_limit = min(max(1, limit), 250)
+    return db.query(Report).order_by(desc(Report.created_at), desc(Report.id)).offset(safe_skip).limit(safe_limit).all()

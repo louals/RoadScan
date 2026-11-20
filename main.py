@@ -1,18 +1,14 @@
 import os
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy import create_engine, text
+from sqlalchemy import text
 from dotenv import load_dotenv
 
 # Load environment variables
 load_dotenv()
 
-DATABASE_URL = os.getenv("DATABASE_URL")
-if DATABASE_URL and DATABASE_URL.startswith("postgresql://"):
-    DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+psycopg://", 1)
-elif DATABASE_URL and DATABASE_URL.startswith("postgres://"):
-    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql+psycopg://", 1)
-engine = create_engine(DATABASE_URL)
+# Use shared database engine
+from database import engine
 
 # Initialize FastAPI app
 app = FastAPI(
@@ -21,15 +17,21 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# Allow the separately hosted browser app to call the API. Set
-# FRONTEND_ORIGINS to a comma-separated list in deployed environments.
+# Allow the separately hosted browser app to call the API.
+raw_origins = os.getenv("FRONTEND_ORIGINS", "")
 frontend_origins = [
     origin.strip()
-    for origin in os.getenv(
-        "FRONTEND_ORIGINS"
-    ).split(",")
+    for origin in raw_origins.split(",")
     if origin.strip()
 ]
+if not frontend_origins:
+    frontend_origins = [
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "http://localhost:3001",
+        "http://127.0.0.1:3001",
+    ]
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=frontend_origins,

@@ -28,14 +28,16 @@ const API_URL = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000").rep
 
 export async function getReports(): Promise<Report[]> {
   const pageSize = 100;
+  const maxReports = 1000;
   const reports: Report[] = [];
-  for (let skip = 0; ; skip += pageSize) {
+  for (let skip = 0; skip < maxReports; skip += pageSize) {
     const response = await fetch(`${API_URL}/api/v1/reports?skip=${skip}&limit=${pageSize}`, { cache: "no-store" });
     if (!response.ok) throw new Error(`Could not load reports (${response.status}).`);
     const page: Report[] = await response.json();
     reports.push(...page);
     if (page.length < pageSize) return reports;
   }
+  return reports;
 }
 
 export async function getCurrentUser(): Promise<RoadScanUser> {
