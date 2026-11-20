@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Toaster } from "sonner";
 import "leaflet/dist/leaflet.css";
 import "./globals.css";
+import "./report.css";
 
 export const metadata: Metadata = {
   title: "RoadScan | Algeria pothole map and reporting",
@@ -9,5 +10,13 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <html lang="en"><body>{children}<Toaster position="top-right" richColors closeButton/></body></html>;
+  return (
+    <html lang="en">
+      <body className="bg-[#121416] text-[#f3f2ee]">
+        {children}
+        <Toaster position="top-right" richColors closeButton />
+      </body>
+    </html>
+  );
 }
+
