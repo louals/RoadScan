@@ -26,7 +26,7 @@ app = FastAPI(
 frontend_origins = [
     origin.strip()
     for origin in os.getenv(
-        "FRONTEND_ORIGINS", "https://road-scan-beta.vercel.app/"
+        "FRONTEND_ORIGINS"
     ).split(",")
     if origin.strip()
 ]
