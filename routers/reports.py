@@ -6,11 +6,11 @@ from database import get_db
 from models import Report
 from routers.auth import get_current_user
 from models import User
-from schemas import ReportResponse
+from schemas import PublicReportResponse, ReportResponse
 
 router = APIRouter(prefix="/api/v1", tags=["Reports"])
 
-@router.get("/reports", response_model=List[ReportResponse])
+@router.get("/reports", response_model=List[PublicReportResponse])
 def get_all_reports(skip: int = 0, limit: int = 50, db: Session = Depends(get_db)):
     safe_skip = max(0, skip)
     safe_limit = min(max(1, limit), 100)
@@ -23,7 +23,7 @@ def get_all_reports(skip: int = 0, limit: int = 50, db: Session = Depends(get_db
     )
     return reports
 
-@router.get("/reports/{report_id}", response_model=ReportResponse)
+@router.get("/reports/{report_id}", response_model=PublicReportResponse)
 def get_report_by_id(report_id: int, db: Session = Depends(get_db)):
     report = db.query(Report).filter(Report.id == report_id).first()
     if not report:

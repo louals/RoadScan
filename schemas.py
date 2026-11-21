@@ -51,14 +51,18 @@ class ReportCreate(ReportBase):
     detections_json: Optional[str] = None
     user_id: Optional[int] = None
 
-class ReportResponse(ReportBase):
+class PublicReportResponse(ReportBase):
     id: int
     image_url: Optional[str] = None
     annotated_image_url: Optional[str] = None
     status: str
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
-    user_id: Optional[int] = None
 
     class Config:
         from_attributes = True
+
+
+class ReportResponse(PublicReportResponse):
+    """Full report representation for authenticated administrator endpoints."""
+    user_id: Optional[int] = None
